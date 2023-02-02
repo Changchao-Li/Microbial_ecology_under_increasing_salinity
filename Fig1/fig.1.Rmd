@@ -100,7 +100,7 @@ p1a
 ##correlations between environmental distance and geographical distance in each transect
 ```{r}
 
-dab <- read.csv("correlations.csv")
+da1 <- read.csv("correlations.csv")
 
 #如果想把 spearman 相关系数的显著性也标记在图中，参考如下操作
 da1[which(da1$p<0.001),'sig'] <- '***'
