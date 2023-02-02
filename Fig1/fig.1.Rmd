@@ -1,5 +1,5 @@
 ---
-title: "network_index_analysis"
+title: "community_diversity_structure"
 author: "Changchao Li"
 date: "2022/2/16"
 output: html_document
