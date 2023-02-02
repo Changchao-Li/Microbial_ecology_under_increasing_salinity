@@ -1,0 +1,138 @@
+---
+title: "compare_abundant_rare"
+author: "Changchao Li"
+date: "2022/2/16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+library("reshape2", quietly=T, warn.conflicts=F)
+library(ggpmisc)
+library(ggpubr)
+library(ggsci)
+library(ggplot2)
+library(RColorBrewer)
+
+sal_col <-  c("#BCCFE2", "#791C75")
+
+lccol = c("#9ECAE1", "#2171B5")
+
+sal8 <- colorRampPalette(brewer.pal(5,"Blues"))(8)
+
+sal6 <- c("#B1D1E4", "#82B9DA", "#5AA1CE", "#3988C0", "#1F6DAE", "#08519C")
+
+```
+
+
+
+##linear regression analyses between the relative degree index and salinity
+```{r}
+
+data = read.csv("compare_abundant_rare.csv")
+
+head(data)
+
+
+p5a <- ggplot(data, aes(x = Salinity, y= relative.degree, color = type)) +  
+  
+  geom_point(shape = 19,  size = 0.8, alpha = 0.6) +
+  
+  geom_smooth(method = 'lm', formula = y~x, se = T, show.legend = FALSE) +
+  
+  stat_poly_eq(aes(label = paste(..rr.label.., stat(p.value.label), sep = '~`,`~')),
+               formula = y~x, parse = TRUE, 
+               label.x.npc = 'right', label.y.npc = 'top', size = 2.7) +
+  
+  scale_color_npg() + 
+  
+  theme_minimal()+
+  
+  theme(legend.position = c(0.9,0.5))
+
+
+p5a
+
+```
+
+
+
+## Difference in the relative degrees between the abundant and rare taxa
+```{r}
+
+d55 = read.csv("difference.csv")
+
+
+p5b <- ggplot(d55, aes(x= Salinity, y= Difference))+
+  
+   geom_boxplot(outlier.size = 0, aes(fill=factor(Network)),
+                position = position_dodge(0.6), size= 0.3) +
+  
+  scale_fill_manual(values = sal6) +
+  
+  theme_minimal()+
+  
+  theme(legend.position = "none", panel.border = element_blank()) +
+  
+  geom_smooth(method = 'lm', formula = y~x, se = TRUE, show.legend = FALSE) +
+  
+  stat_poly_eq(aes(label = paste(..rr.label.., stat(p.value.label), sep = '~`,`~')),
+               formula = y~x, parse = TRUE, 
+               label.x.npc = 'right', label.y.npc = 'top', size = 2.7) 
+
+
+p5b
+
+```
+
+
+## effect size
+```{r}
+
+d56 = read.csv("compare_effect_size.csv")
+
+head(d56)
+
+
+p5c <- ggplot(d56, aes(x= Salinity, y= Effect_Size))+
+  
+  geom_point(aes(fill = Network),shape = 21, color ="#0073C2FF", size = 3.6, alpha = 1) +
+  
+  scale_fill_manual(values = sal6) +
+  
+  theme_minimal()+
+  
+  theme(legend.position = "none", panel.border = element_blank()) +
+  
+  geom_smooth(method = 'lm', formula = y~x, se = TRUE, show.legend = FALSE) +
+  
+  stat_poly_eq(aes(label = paste(..rr.label.., stat(p.value.label), sep = '~`,`~')),
+               formula = y~x, parse = TRUE, 
+               label.x.npc = 'right', label.y.npc = 'top', size = 2.7) 
+
+
+p5c
+
+```
+
+
+
+## 合并子图并添加图号
+```{r}
+
+library(cowplot)
+
+p5 <- plot_grid(p5a, p5b,p5c, rel_heights = c(1,1,1),labels = LETTERS[1:3], nrow = 3)
+
+p5
+
+ggsave(plot = p5, "Fig5.pdf", width = 90, height = 180, units = c("mm"), dpi = 300)
+
+```
+
+

@@ -1,0 +1,143 @@
+---
+title: "network_community_analysis"
+author: "Changchao Li"
+date: "2022/2/16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+library("reshape2", quietly=T, warn.conflicts=F)
+library(ggpmisc)
+library(ggpubr)
+library(spaa)
+library(ggsci)
+library(ggplot2)
+library(RColorBrewer)
+
+
+sal_col <-  c("#BCCFE2", "#791C75")
+
+lccol = c("#9ECAE1", "#2171B5")
+
+sal8 <- colorRampPalette(brewer.pal(5,"Blues"))(8)
+
+sal6 <- c("#B1D1E4", "#82B9DA", "#5AA1CE", "#3988C0", "#1F6DAE", "#08519C")
+
+```
+
+
+
+##Proportions of abundant and rare taxa in each network community
+```{r}
+
+data = read.csv("nodes_rare_abundant_percent.csv")
+
+p4b = ggplot(data, aes(Network, value, fill = type)) +
+  
+  geom_bar(stat = "identity", position = "dodge", alpha = 1) +
+  
+  scale_fill_npg() +
+  
+  theme_minimal() + 
+  
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 45, hjust = 0.8, vjust = 0.8))
+
+p4b
+
+```
+
+
+##Proportions of abundant and rare taxa in the overlapping nodes between network communities. 
+```{r}
+
+data2 <- read.csv("overlap_rare_abundant_percent.csv")
+
+p4c = ggplot(data2, aes(network, overlap_persent, fill = type)) +
+  
+  geom_bar(stat = "identity", position = "dodge", alpha = 1) +
+  
+  scale_fill_npg() +
+  
+  theme_minimal() + 
+  
+  theme(legend.position = c(0.9,0.9),
+        axis.text.x = element_text(angle = 45, hjust = 0.8, vjust = 0.8))
+
+p4c
+
+```
+
+
+
+
+## niche breadth
+```{r}
+
+##abundant
+data1 <- read.csv("abundant.csv", header = T, row.names = 1)
+
+data1 = t(data1)
+
+d1 = niche.width(data1, method = c("levins"))
+
+# write.csv(d1, "ecological_niche_abundant.csv", quote = F)
+
+
+##rare
+data2 <- read.csv("rare.csv", header = T, row.names = 1)
+
+data2 = t(data2)
+
+d2 = niche.width(data2, method = c("levins"))
+
+# write.csv(d2, "ecological_niche_rare.csv", quote = F)
+
+
+
+d4d = read.csv("abundant_rare_niche.csv")
+
+
+p4d <- ggplot(d4d, aes(x= type, y= niche_breadth, fill = type)) +  
+  
+  geom_violin()+
+  
+  geom_boxplot(fill="white", width=0.2) +
+  
+  stat_compare_means(aes(group = type),method = "wilcox.test",label = "p.signif") +
+  
+  scale_fill_npg()+
+  
+  theme_minimal() +
+  
+  theme(legend.position = c(0.9,0.9))
+
+p4d
+
+```
+
+
+## 合并图像
+```{r}
+
+library(cowplot)
+
+p4 <- plot_grid(p4b, p4c, p4d, rel_heights = c(1,1,1),labels = LETTERS[2:4], nrow = 3)
+
+p4
+
+
+# save plots
+
+ggsave(plot = p4, "Fig4.pdf", 
+       width = 86, height = 166, units = c("mm"), dpi = 300)
+
+```
+
+

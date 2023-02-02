@@ -1,0 +1,352 @@
+---
+title: "network_index_analysis"
+author: "Changchao Li"
+date: "2022/2/16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+library(spaa)
+library(ggplot2)
+library(ggpubr)
+library(vegan)
+library(ggcor)
+library(dplyr)
+library(patchwork)
+library(ggsci)
+library(ggpmisc)
+library(RColorBrewer)
+
+sal2 <- colorRampPalette(brewer.pal(5,"Blues"))(2)
+
+taxcol <- c("#64A4CC", "#9CCEE3", "#C7E5DB", "#ECF6C8", "#FEEDAA", "#FDC980", "#F89D59",
+            "#E75B3A", "#D7191C")
+
+```
+
+
+
+##map
+```{r}
+
+package.list=c("geoviz","tidyverse","sf","terra","rasterVis","ggspatial",
+               "rgdal","rnaturalearth","rnaturalearthdata","raster")
+
+for (package in package.list) {
+  if(!require(package,character.only=T,quietly=T)){
+    install.packages(package)
+    library(package,character.only = T)
+  }
+}
+
+sal8 <- colorRampPalette(brewer.pal(5,"Blues"))(8)
+
+
+shp1 <- sf::read_sf("shandong.json")
+
+geo <- read.csv("geodata.csv", row.names = 1)
+
+color2 = colorRampPalette(c("#EFF3FF", "#08519C"))(66)
+
+p1a <-ggplot()+
+  
+  geom_sf(data=shp1)+
+  
+  annotation_scale(location="br")+ # 设置距离刻度尺
+  
+  labs(x=NULL,y=NULL)+
+  
+  geom_sf(data=shp1, fill="white",size=0.4,color="grey")+#添加地图边界
+  
+  xlim(120,121.2)+
+  
+  ylim(36,36.7)+
+  
+  geom_point(data = geo, aes(lon, lat, fill = salinity), 
+             size = 1.8, alpha = 1, shape = 21, stroke = 0.2) +
+  
+  scale_fill_gradientn(colours = color2) +
+  
+  theme_bw()+
+  
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        legend.title = element_blank(),
+        plot.background = element_rect(fill="#CADEF0", color="gray71",size = 0.5),
+        axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
+        legend.position = c(0.9, 0.3),
+        legend.background = element_rect(fill = F),
+        legend.key.size = unit(12, "pt"))+
+  
+  annotation_north_arrow(location="tl",
+                         style = north_arrow_fancy_orienteering(
+                           fill = c("grey40","white"),
+                           line_col = "grey20"))
+
+
+p1a
+
+
+```
+
+
+##correlations between environmental distance and geographical distance in each transect
+```{r}
+
+dab <- read.csv("correlations.csv")
+
+#如果想把 spearman 相关系数的显著性也标记在图中，参考如下操作
+da1[which(da1$p<0.001),'sig'] <- '***'
+da1[which(da1$p.value<0.01 & da1$p.value>0.001),'sig'] <- '**'
+da1[which(da1$p.value<0.05 & da1$p.value>0.01),'sig'] <- '*'
+head(da1) 
+
+
+p1b <- ggplot() +
+  
+  geom_tile(data = dab, 
+            aes(y = class, x = variable1, fill = A)) +
+  
+  scale_fill_gradientn(colors = c("#EFC000FF", "white",  "#0073C2FF"), limit = c(-1, 1)) +
+  
+  geom_point(data = da1, 
+             aes(y = class, x = variable1, color = r,size = abs(r)), 
+              shape = 19) +
+  
+  scale_size_continuous(range = c(0, 12)) +
+  
+  labs(size = 'r') +
+  
+  scale_color_gradientn(colors = c("#EFC000FF", "white",  "#0073C2FF"), 
+                       limit = c(-1, 1)) +
+  
+  theme_light()+
+  
+  theme(panel.background = element_rect(), 
+        legend.key = element_blank(), 
+        axis.text.x = element_text(color = 'black', angle = 45, hjust = 1, vjust = 1),
+        axis.text.y = element_text(color = 'black'), 
+        axis.ticks = element_line(color = 'black')) +
+  
+  scale_x_discrete(expand = c(0, 0)) +
+  
+  scale_y_discrete(expand = c(0, 0)) +
+  
+  labs(y = '', x = '', fill = 'r') +
+  
+  geom_text(data = da1, aes(y = class, x = variable1,label = sig), size = 6, color = "red")
+  
+
+
+
+p1b
+
+
+```
+
+
+
+##mantel test
+```{r}
+
+env <- read.csv("envdata.csv", row.names = 1)
+
+otu <- read.csv("all_otu.csv", row.names = 1)
+
+nrow(otu)
+
+otu = t(otu)
+
+corr <- fortify_cor(env, type = "lower", show.diag = TRUE,
+                    cor.test = TRUE, cluster.type = "all")
+head(corr)
+
+
+
+mantel <- mantel_test(otu, env, mantel.fun = 'mantel.randtest',spec.dist.method = 'bray', env.dist.method = 'euclidean', 
+                      spec.select = list(Bacteriome = 1:2619)) %>% 
+  mutate(r_value = cut(r, breaks = c(-Inf, 0.2, 0.4, Inf), 
+                       labels = c('<0.2', '0.2-0.4', '>=0.4'), right = FALSE),
+         p_value = cut(p.value, breaks = c(-Inf, 0.001, 0.01, 0.05, Inf), 
+                       labels = c('<0.001', '0.001-0.01', '0.01-0.05', '>=0.05'), right = FALSE))
+
+
+
+
+mantel$p_value
+
+mantel$r
+
+mantel_result <- data.frame(mantel$p_value, mantel$r)
+
+# write.csv(mantel_result, "all_mantel_result.csv")
+
+summary(mantel)
+
+
+library(linkET)
+
+
+p1c =  qcorrplot(env, type = "upper") +
+  
+  geom_circle2() +
+  
+  geom_couple(mantel, mapping = aes(colour = p_value, size = r_value), 
+           curvature = -0.16, alpha=0.8) +
+  
+  scale_size_manual(values = c(0.6, 1.0, 1.6))  +
+  
+  scale_colour_manual(values = c("#8491B4FF", "#F39B7FFF", "#91D1C2FF")) +
+  
+  scale_fill_gradient2(midpoint = 0, low = "#EFC000FF", 
+                       mid = "white", high = "#0073C2FF", space = "Lab") +
+
+  guides(size = guide_legend(title = "Mantel's r",override.aes = list(colour = "grey35"),order = 2),
+         
+         colour = guide_legend(title = "Mantel's p", override.aes = list(size = 3),order = 1),
+        
+          fill = guide_colorbar(title = "Pearson's r", order = 3))
+
+
+p1c
+
+# ggsave(plot = p1, "mantel_all.pdf", width = 150, height = 150, units = c("mm"))
+
+```
+
+
+
+## mantel r值的柱形图
+```{r}
+d1c2 <- read.csv("mantel_r_ALL.csv", header = TRUE)
+
+p1c2 <- ggplot(d1, aes(x = factor, y = mantel_r, fill = p_value)) + 
+  
+  geom_bar(stat="identity") + 
+  
+  theme_minimal()+
+  
+  scale_fill_manual(values = c("#8491B4FF", "#F39B7FFF")) +
+  
+  theme(axis.text.x = element_text(color = 'black', angle = 45, hjust = 1, vjust = 1),
+        legend.position = "none") 
+
+
+p1c2
+
+ggsave(plot = p1c2, "mantel_r.pdf", height = 56, width = 90, units = "mm")
+
+```
+
+
+
+
+## alpha-diversity with changing salinity
+```{r}
+
+d1d <- read.csv("alpha_salinity.csv")
+
+p1d1 <- ggplot(d1d, aes(x= salinity, y= chao1))+
+  
+  geom_point(aes(fill = salinity), color ="#0073C2FF", shape = 21, size = 2.6, alpha = 1) +
+  
+  scale_fill_gradientn(colours = sal2) +
+  
+  theme_minimal() +
+  
+  theme(legend.position = "none") +
+  
+  geom_smooth(method = 'lm', formula = y~x, se = TRUE, show.legend = FALSE) +
+  
+  stat_poly_eq(aes(label = paste(..rr.label.., stat(p.value.label), sep = '~`,`~')),
+               formula = y~x, parse = TRUE, 
+               label.x.npc = 'right', label.y.npc = 'top', size = 2.7)
+
+
+p1d1
+
+
+
+
+p1d2 <- ggplot(d1d, aes(x= salinity, y= shannon))+
+  
+  geom_point(aes(fill = salinity), color ="#0073C2FF", shape = 21, size = 2.6, alpha = 1) +
+  
+  scale_fill_gradientn(colours = sal2) +
+  
+  theme_minimal() +
+  
+  theme(legend.position = "none") +
+  
+  geom_smooth(method = 'lm', formula = y~x, se = TRUE, show.legend = FALSE) +
+  
+  stat_poly_eq(aes(label = paste(..rr.label.., stat(p.value.label), sep = '~`,`~')),
+               formula = y~x, parse = TRUE, 
+               label.x.npc = 'right', label.y.npc = 'top', size = 2.7)
+
+
+p1d2
+
+```
+
+
+
+##taxonomic dynamic
+```{r}
+
+library("reshape2", quietly=T, warn.conflicts=F)
+library(ggalluvial)
+library(ggsci)
+
+d1e <- read.csv("ProClass.csv")
+
+d1e = as.data.frame(melt(d1e, id.vars=c("phylumpro")))
+
+head(d1e)
+
+p1e = ggplot(data = d1e, aes(x = variable, y = value, alluvium = phylumpro)) +
+  
+  geom_alluvium(aes(fill = phylumpro), alpha = 1) +
+  
+  scale_fill_manual(values = taxcol)+ 
+  
+  theme_minimal() + 
+  
+  theme(axis.text.x = element_blank(), legend.position = "none",
+        panel.grid.minor = element_blank(), panel.spacing.x = element_blank())
+
+
+p1e
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+

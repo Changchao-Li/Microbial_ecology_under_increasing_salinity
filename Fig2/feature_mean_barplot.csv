@@ -1,0 +1,145 @@
+salinity,colonizing_type,mean_abundance,sd,salinity2
+1,Low-salinity colonizing,2.459199412,6.370444301,X1
+1,High-salinity colonizing,8.399666667,8.183132672,X1
+1,Complex,0.270733333,0.232499491,X1
+10,Low-salinity colonizing,1.154558824,2.833103564,X10
+10,High-salinity colonizing,13.17433333,12.20113013,X10
+10,Complex,0.2221,0.189130986,X10
+11,Low-salinity colonizing,2.348338235,6.177603604,X11
+11,High-salinity colonizing,8.001,7.776538626,X11
+11,Complex,0.291733333,0.238488602,X11
+12,Low-salinity colonizing,2.026052941,4.581658345,X12
+12,High-salinity colonizing,7.539,7.75893311,X12
+12,Complex,0.4861,0.546584605,X12
+13,Low-salinity colonizing,2.158914706,5.957859117,X13
+13,High-salinity colonizing,9.417333333,8.939187957,X13
+13,Complex,0.212566667,0.154270747,X13
+14,Low-salinity colonizing,1.985196471,4.837126722,X14
+14,High-salinity colonizing,7.594,8.508740682,X14
+14,Complex,0.328066667,0.35950134,X14
+15,Low-salinity colonizing,0.564661176,1.347559415,X15
+15,High-salinity colonizing,12.32066667,12.55656328,X15
+15,Complex,0.122566667,0.119413414,X15
+16,Low-salinity colonizing,0.506528235,1.319055951,X16
+16,High-salinity colonizing,12.422,12.94344823,X16
+16,Complex,0.210433333,0.22024251,X16
+17,Low-salinity colonizing,2.148667059,5.520237955,X17
+17,High-salinity colonizing,7.951,8.361076067,X17
+17,Complex,0.2904,0.233695272,X17
+18,Low-salinity colonizing,1.984249412,4.531440282,X18
+18,High-salinity colonizing,7.17,7.628033823,X18
+18,Complex,0.340966667,0.330990941,X18
+19,Low-salinity colonizing,1.794582353,4.193960002,X19
+19,High-salinity colonizing,9.273666667,10.86367941,X19
+19,Complex,0.3645,0.380123335,X19
+2,Low-salinity colonizing,2.922897059,8.437348727,X2
+2,High-salinity colonizing,8.420666667,7.468378762,X2
+2,Complex,0.219066667,0.194181393,X2
+20,Low-salinity colonizing,0.814435294,1.898504291,X20
+20,High-salinity colonizing,8.584666667,8.62444348,X20
+20,Complex,0.505133333,0.670095108,X20
+21,Low-salinity colonizing,0.997822941,2.265020315,X21
+21,High-salinity colonizing,13.85066667,15.22056836,X21
+21,Complex,0.275266667,0.169708613,X21
+22,Low-salinity colonizing,0.906205882,2.154168548,X22
+22,High-salinity colonizing,14.75466667,16.39332075,X22
+22,Complex,0.270033333,0.179412941,X22
+23,Low-salinity colonizing,1.119531176,2.544884827,X23
+23,High-salinity colonizing,11.36266667,11.15688941,X23
+23,Complex,0.3167,0.246300568,X23
+24,Low-salinity colonizing,1.539347059,4.366649122,X24
+24,High-salinity colonizing,13.075,11.59846434,X24
+24,Complex,0.140966667,0.150488217,X24
+25,Low-salinity colonizing,0.494326471,1.196447499,X25
+25,High-salinity colonizing,6.497,6.537965815,X25
+25,Complex,1.022766667,1.576164859,X25
+26,Low-salinity colonizing,1.602064118,4.488535969,X26
+26,High-salinity colonizing,11.56833333,10.02434578,X26
+26,Complex,0.144596667,0.160315464,X26
+27,Low-salinity colonizing,0.882402941,1.983185227,X27
+27,High-salinity colonizing,13.745,14.54075565,X27
+27,Complex,0.274266667,0.194120615,X27
+28,Low-salinity colonizing,0.707038235,2.039594611,X28
+28,High-salinity colonizing,17.049,17.47162279,X28
+28,Complex,0.1209,0.137272466,X28
+29,Low-salinity colonizing,1.542734706,4.267524917,X29
+29,High-salinity colonizing,12.18366667,11.23249751,X29
+29,Complex,0.145566667,0.145246216,X29
+3,Low-salinity colonizing,2.749473529,7.045071235,X3
+3,High-salinity colonizing,8.111666667,7.125230406,X3
+3,Complex,0.236266667,0.197885354,X3
+30,Low-salinity colonizing,0.996547059,2.216365908,X30
+30,High-salinity colonizing,12.765,13.24787436,X30
+30,Complex,0.246033333,0.159744807,X30
+31,Low-salinity colonizing,0.652370588,1.930888456,X31
+31,High-salinity colonizing,16.62533333,16.62387215,X31
+31,Complex,0.091613333,0.093175289,X31
+32,Low-salinity colonizing,0.993526471,2.163097891,X32
+32,High-salinity colonizing,12.178,12.0853983,X32
+32,Complex,0.206633333,0.111647675,X32
+33,Low-salinity colonizing,0.586711176,1.22988318,X33
+33,High-salinity colonizing,16.335,15.64752936,X33
+33,Complex,0.1631,0.163790201,X33
+34,Low-salinity colonizing,0.713847059,1.751210435,X34
+34,High-salinity colonizing,12.32133333,12.96431122,X34
+34,Complex,0.214466667,0.165577333,X34
+35,Low-salinity colonizing,0.702908235,1.884013068,X35
+35,High-salinity colonizing,16.257,15.66454426,X35
+35,Complex,0.294833333,0.248948957,X35
+36,Low-salinity colonizing,0.854979412,2.534403619,X36
+36,High-salinity colonizing,16.013,17.56639425,X36
+36,Complex,0.227166667,0.180122412,X36
+37,Low-salinity colonizing,0.696911176,1.627989904,X37
+37,High-salinity colonizing,15.683,15.48679977,X37
+37,Complex,0.183033333,0.151990142,X37
+38,Low-salinity colonizing,0.698702353,1.84167901,X38
+38,High-salinity colonizing,15.70333333,15.56467261,X38
+38,Complex,0.327233333,0.300492867,X38
+39,Low-salinity colonizing,0.777264706,2.525743217,X39
+39,High-salinity colonizing,16.66633333,18.96732982,X39
+39,Complex,0.179833333,0.146915225,X39
+4,Low-salinity colonizing,2.601458824,7.092432001,X4
+4,High-salinity colonizing,7.980666667,7.28270014,X4
+4,Complex,0.254733333,0.219516772,X4
+40,Low-salinity colonizing,0.963491176,2.283080725,X40
+40,High-salinity colonizing,11.642,12.02773013,X40
+40,Complex,0.3469,0.336031888,X40
+41,Low-salinity colonizing,0.512594118,1.08469349,X41
+41,High-salinity colonizing,13.92766667,15.8409342,X41
+41,Complex,0.1738,0.148825804,X41
+42,Low-salinity colonizing,0.462555294,1.165589326,X42
+42,High-salinity colonizing,12.828,13.39187634,X42
+42,Complex,0.1228,0.113875897,X42
+43,Low-salinity colonizing,0.672757647,1.628272799,X43
+43,High-salinity colonizing,16.391,15.96548912,X43
+43,Complex,0.1599,0.173670464,X43
+44,Low-salinity colonizing,0.528614118,1.204026629,X44
+44,High-salinity colonizing,15.324,18.98129785,X44
+44,Complex,0.1494,0.116139055,X44
+45,Low-salinity colonizing,0.742397059,1.659221177,X45
+45,High-salinity colonizing,14.32566667,14.55684294,X45
+45,Complex,0.168166667,0.127456202,X45
+46,Low-salinity colonizing,0.624617059,1.411009078,X46
+46,High-salinity colonizing,17.89333333,17.39586541,X46
+46,Complex,0.209033333,0.240437941,X46
+47,Low-salinity colonizing,0.642397059,1.43648369,X47
+47,High-salinity colonizing,15.36633333,15.74287141,X47
+47,Complex,0.229433333,0.274887365,X47
+48,Low-salinity colonizing,0.682025882,1.568515979,X48
+48,High-salinity colonizing,16.05466667,15.99928015,X48
+48,Complex,0.239666667,0.260454091,X48
+5,Low-salinity colonizing,2.754147059,6.939607762,X5
+5,High-salinity colonizing,7.346,6.859036959,X5
+5,Complex,0.309733333,0.24298192,X5
+6,Low-salinity colonizing,1.936220588,5.183042001,X6
+6,High-salinity colonizing,8.003333333,7.921113137,X6
+6,Complex,0.3668,0.34884971,X6
+7,Low-salinity colonizing,0.792528824,1.957294749,X7
+7,High-salinity colonizing,13.063,13.02695694,X7
+7,Complex,0.192766667,0.145728046,X7
+8,Low-salinity colonizing,0.815873529,2.199926064,X8
+8,High-salinity colonizing,14.47433333,13.75709549,X8
+8,Complex,0.1365,0.124301046,X8
+9,Low-salinity colonizing,1.715555294,3.899303619,X9
+9,High-salinity colonizing,6.837666667,7.17614704,X9
+9,Complex,0.413033333,0.4256313,X9

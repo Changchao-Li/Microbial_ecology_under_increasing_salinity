@@ -1,0 +1,71 @@
+---
+title: "effect_size(freemanTheta)"
+author: "Changchao Li"
+date: "2022/2/16"
+output: html_document
+---
+
+
+```{r}
+
+library(rcompanion)
+
+
+d1 <- read.csv("compare_abundant_rare_n1.csv")
+
+wilcox.test(relative.degree~type,data = d1)
+
+freemanTheta(x=d1$relative.degree,g=d1$type)
+
+
+
+d2 <- read.csv("compare_abundant_rare_n2.csv")
+
+wilcox.test(relative.degree~type,data = d2)
+
+freemanTheta(x=d2$relative.degree,g=d2$type)
+
+
+
+
+d3 <- read.csv("compare_abundant_rare_n3.csv")
+
+wilcox.test(relative.degree~type,data = d3)
+
+freemanTheta(x=d3$relative.degree,g=d3$type)
+
+
+
+
+
+d4 <- read.csv("compare_abundant_rare_n4.csv")
+
+wilcox.test(relative.degree~type,data = d4)
+
+freemanTheta(x=d4$relative.degree,g=d4$type)
+
+
+
+
+
+d5 <- read.csv("compare_abundant_rare_n5.csv")
+
+wilcox.test(relative.degree~type,data = d5)
+
+freemanTheta(x=d5$relative.degree,g=d5$type)
+
+
+
+
+
+d6 <- read.csv("compare_abundant_rare_n6.csv")
+
+wilcox.test(relative.degree~type,data = d6)
+
+freemanTheta(x=d6$relative.degree,g=d6$type)
+
+
+```
+
+
+

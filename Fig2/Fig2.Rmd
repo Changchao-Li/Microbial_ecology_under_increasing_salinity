@@ -1,0 +1,255 @@
+---
+title: "RF_regression"
+author: "Changchao Li"
+date: "2022/4/29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(randomForest)
+library(ImageGP)
+library(ggpmisc)
+library(ggplot2)
+library(ggsci)
+library(RColorBrewer)
+
+sal2 <- colorRampPalette(brewer.pal(5,"Blues"))(2)
+
+taxcol2 <- colorRampPalette(brewer.pal(5,"RdYlBu"))(12)
+
+peakcol = c("#9ECAE1", "#2171B5", "#999999")  
+
+```
+
+
+```{r}
+
+tc_map =read.csv("design.csv",header = T, row.names = 1)
+
+otu_table =read.table("class.txt",header = T, row.names = 1)
+
+
+sub_map = tc_map
+
+sub_otu = otu_table
+
+
+set.seed(308)
+
+rf = randomForest(t(sub_otu), sub_map$salinity, importance=TRUE, proximity=TRUE, ntree = 1000)
+
+```
+
+
+```{r}
+
+salinityDF <- data.frame(Real_salinity=sub_map$salinity, Predicted_salinity=predict(rf, newdata=t(sub_otu)))
+
+
+p2a <- ggplot(salinityDF, aes(x= Predicted_salinity, y= Real_salinity))+
+  
+  
+  geom_point(aes(fill = Real_salinity), shape = 21,color ="#0073C2FF",size = 3, alpha = 0.8) +
+  
+  scale_fill_gradientn(colours = sal2) +
+  
+  theme_minimal()+
+  
+  theme(legend.position = "none", panel.border = element_blank()) +
+  
+  geom_smooth(method = 'lm', formula = y~x, se = TRUE, show.legend = FALSE) +
+  
+  stat_poly_eq(aes(label = paste(..rr.label.., stat(p.value.label), sep = '~`,`~')),
+               formula = y~x, parse = TRUE, 
+               label.x.npc = 'left', label.y.npc = 'top', size = 2.7) 
+
+
+p2a
+
+```
+
+
+## 交叉验证选择Features
+```{r}
+
+result1 = rfcv(t(sub_otu), sub_map$salinity, cv.fold=10)
+
+error.cv = result1$error.cv
+##  23个特征值时效果最好
+
+
+with(result1, plot(n.var, error.cv, log="x", type="o", lwd=2))
+
+
+imp= as.data.frame(rf$importance)
+
+imp = imp[order(imp[,1],decreasing = T),]
+
+head(imp)
+
+# write.table(imp,file = "importance_class.txt",quote = F,sep = '\t', row.names = T, col.names = T)
+```
+
+
+
+
+
+```{r}
+
+# 读取所有feature贡献度
+imp = read.table("top23_class.txt", header=T, row.names= 1) 
+
+# 反向排序X轴，让柱状图从上往下画
+imp=imp[order(1:23,decreasing = T),]
+
+imp$class = row.names(imp)
+imp$phylum = imp$phylum
+
+
+imp$class=factor(imp$class,levels = imp$class)
+
+
+lc = c(pal_npg()(3),pal_jco()(10))
+
+p2b = ggplot(data = imp, mapping = aes(x=class,y=X.IncMSE,fill=phylum)) + 
+  
+  theme_minimal()+
+  
+  scale_fill_manual(values = taxcol2) +
+  
+  geom_bar(stat="identity")+
+  
+  coord_flip() +
+  
+  theme(legend.position = c(0.6,0.36))
+
+
+p2b
+
+```
+
+
+
+
+###  峰峦图
+```{r}
+
+# feature <- read.table("top23_class.txt", header=T, row.names= 1)
+# class <- read.table("class.txt", header=T, row.names= 1)
+# feature23 <- class[rownames(feature), ]
+# dim(feature23)
+# write.csv(feature23, "feature23_2.csv", quote = F)
+
+otu <- read.csv('feature23.csv')
+
+#由于各 OTU 丰度之间差异巨大，对丰度作个标准化处理
+otu[2:ncol(otu)] <- scale(otu[2:ncol(otu)], center = FALSE)
+
+
+otu <- reshape2::melt(otu, id = 'Salinity')
+
+head(otu)
+
+
+library(ggplot2)
+library(ggridges)
+library(ggsci)
+
+
+#读取分组数据
+type <- read.csv('feature_type.csv')
+
+#合并到作图数据
+otu <- merge(otu, type, by = 'variable')
+
+#绘制山峦图，详情 ?geom_ridgeline_gradient
+head(otu)
+
+p2c <-  ggplot(otu, aes(x = Salinity, y = variable, height = value, fill = type))  +
+  
+        geom_ridgeline(stat = "identity",scale = 1, color = 'white', show.legend = T) +  
+  
+        scale_fill_manual(values = peakcol,limits = c('Low-salinity colonizing',
+                                                      'High-salinity colonizing','Complex')) +
+  
+        labs(x = 'Salinity (ppt)', y = 'Salinity discriminant features') +
+  
+        theme_minimal() +
+  
+        scale_x_continuous(expand = c(0, 0))+
+  
+  theme(axis.title.x = element_blank(), axis.text.x.bottom = element_blank())
+
+
+p2c
+
+```
+
+
+```{r}
+
+#### mean abundance of features
+# library(reshape)
+# mydata1 <- read.csv("feature_mean_abundance.csv")
+# dat = as.data.frame(melt(mydata1, id.vars=c("group")))
+# write.csv(dat, "feature_mean_abundance_boxplot_data2.csv", quote = F)
+
+dat6 <- read.csv("feature_mean_barplot.csv")
+
+head(dat6)
+
+p2d <- ggplot(dat6, aes(x= salinity, y= mean_abundance, fill = colonizing_type)) +  
+  
+  geom_bar(stat="identity")+
+  
+  scale_fill_manual(values = peakcol,limits = c('Low-salinity colonizing',
+                                                'High-salinity colonizing','Complex')) +
+  
+  theme_minimal() + 
+  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, 
+                                   size = 10, color = "black"),
+        axis.text = element_text(size=9)) + 
+  
+  facet_wrap(~colonizing_type, scale = "free_y")
+
+
+p2d
+
+```
+
+
+
+###### 整合左右图片
+```{r}
+
+library(patchwork)
+library(cowplot)
+
+p2ab <- p2a + p2b + plot_layout(heights = c(1,2), nrow = 2)
+
+p2ab
+
+
+
+p2cd <- plot_grid(p2c, p2d, nrow = 2, rel_heights = c(2,1), labels = letters[3:4])
+
+p2cd
+
+
+fig2 <- plot_grid(p2ab, p2cd, nrow = 1, 
+                 
+                 rel_widths = c(1,1.6), labels = letters[1:2])
+
+fig2
+
+ggsave(plot = fig2, "Fig2.pdf", width = 266, height = 180, units = c("mm"))
+
+```
+
+6

@@ -1,0 +1,246 @@
+---
+title: "network_index_analysis"
+author: "Changchao Li"
+date: "2022/2/16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+library("reshape2", quietly=T, warn.conflicts=F)
+library(ggpmisc)
+library(ggpubr)
+library(ggsci)
+library(ggplot2)
+library(RColorBrewer)
+library(igraph)
+library(dplyr)
+library(Hmisc)
+
+sal_col <-  c("#BCCFE2", "#791C75")
+
+lccol = c("#9ECAE1", "#2171B5")
+
+sal8 <- colorRampPalette(brewer.pal(5,"Blues"))(8)
+
+sal6 <- c("#B1D1E4", "#82B9DA", "#5AA1CE", "#3988C0", "#1F6DAE", "#08519C")
+
+col_g <- "#C1C1C1"
+
+cols <- pal_jco()(10)
+
+```
+
+
+
+
+
+## network visualization
+```{r}
+
+adj1 <- read.csv('n1_matrix0_1.csv', row.names = 1, check.names = FALSE)
+adj2 <- read.csv('n2_matrix0_1.csv', row.names = 1, check.names = FALSE)
+adj3 <- read.csv('n3_matrix0_1.csv', row.names = 1, check.names = FALSE)
+adj4 <- read.csv('n4_matrix0_1.csv', row.names = 1, check.names = FALSE)
+adj5 <- read.csv('n5_matrix0_1.csv', row.names = 1, check.names = FALSE)
+adj6 <- read.csv('n6_matrix0_1.csv', row.names = 1, check.names = FALSE)
+
+```
+
+
+
+```{r}
+
+gcb <- function(adj_matrix) {
+  
+  adj_matrix <- as.matrix(adj_matrix)
+  adj_matrix[abs(adj_matrix) != 0] <- 1
+  gcb <-  graph_from_adjacency_matrix(as.matrix(adj_matrix), mode="undirected",
+                                      weighted=NULL,diag=FALSE)
+  
+  # 删除自相关
+  gcb <- simplify(gcb)
+
+  # 删除孤立节点
+  # gcb <- delete.vertices(gcb, which(degree(gcb)==0) )
+  
+  return(gcb)
+}
+
+```
+
+
+##按照模块设置节点的颜色
+```{r}
+g1 <- gcb(adj1)
+
+fc1 = cluster_fast_greedy(g1,weights =NULL)
+V(g1)$modularity <- membership(fc1)
+
+V(g1)$label <- V(g1)$name
+V(g1)$label <- NA
+modu_sort <- V(g1)$modularity %>% table() %>% sort(decreasing = T)
+top_num <- 10
+modu_name <- names(modu_sort[1:10])
+modu_cols <- cols
+names(modu_cols) <- modu_name
+V(g1)$color <- V(g1)$modularity
+V(g1)$color[!(V(g1)$color %in% modu_name)] <- col_g
+V(g1)$color[(V(g1)$color %in% modu_name)] <- modu_cols[match(V(g1)$color[(V(g1)$color %in% modu_name)],modu_name)]
+V(g1)$frame.color <- V(g1)$color
+
+```
+
+
+
+
+
+##设置边的颜色
+```{r}
+
+E(g1)$color <- col_g
+for ( i in modu_name){
+  col_edge <- cols[which(modu_name==i)]
+  otu_same_modu <-V(g1)$name[which(V(g1)$modularity==i)]
+  E(g1)$color[(data.frame(as_edgelist(g1))$X1 %in% otu_same_modu)&(data.frame(as_edgelist(g1))$X2 %in% otu_same_modu)] <- col_edge
+}
+
+```
+
+
+
+```{r}
+
+pdf(paste0("Fig3a.pdf"), encoding="MacRoman", width=15, height=16)
+par(mfrow=c(2,3),mar=c(0,0,1,0),font.main=4)
+
+filelist <- c("n1_matrix0_1.csv","n2_matrix0_1.csv","n3_matrix0_1.csv", "n4_matrix0_1.csv","n5_matrix0_1.csv","n6_matrix0_1.csv")
+
+
+for(i in 1:6){
+  adj1 <- read.csv(filelist[i], row.names = 1, check.names = FALSE)
+  g1 <- gcb(adj1)
+  fc1 = cluster_fast_greedy(g1,weights =NULL)
+  V(g1)$modularity <- membership(fc1)
+
+  V(g1)$label <- V(g1)$name
+  V(g1)$label <- NA
+  modu_sort <- V(g1)$modularity %>% table() %>% sort(decreasing = T)
+
+top_num <- 10
+modu_name <- names(modu_sort[1:10])
+modu_cols <- cols
+names(modu_cols) <- modu_name
+V(g1)$color <- V(g1)$modularity
+V(g1)$color[!(V(g1)$color %in% modu_name)] <- col_g
+V(g1)$color[(V(g1)$color %in% modu_name)] <- modu_cols[match(V(g1)$color[(V(g1)$color %in% modu_name)],modu_name)]
+V(g1)$frame.color <- V(g1)$color
+
+
+  E(g1)$color <- col_g
+  for ( i in modu_name){
+    col_edge <- cols[which(modu_name==i)]
+    otu_same_modu <-V(g1)$name[which(V(g1)$modularity==i)]
+    E(g1)$color[(data.frame(as_edgelist(g1))$X1 %in% otu_same_modu)&(data.frame(as_edgelist(g1))$X2 %in% otu_same_modu)] <- col_edge
+  }
+
+  sub_net_layout <- layout_with_fr(g1, niter= 666,grid = 'nogrid')
+  plot(g1,layout=sub_net_layout,edge.curved= F, edge.color = E(g1)$color,vertex.size=2.36)
+  title(main = paste0('Nodes=',length(V(g1)$name),', ','Edges=',nrow(data.frame(as_edgelist(g1)))))
+}
+
+dev.off()
+
+```
+
+
+
+
+## network index regression
+```{r}
+
+data <- read.csv("index.csv", header = T)
+
+
+data_all = as.data.frame(melt(data, id.vars=c("Network", "Salinity")))
+
+
+p3b <- ggplot(data_all, aes(x= Salinity, y= value))+
+  
+  
+  geom_point(aes(fill = Network),shape = 21, color ="#0073C2FF", size = 3, alpha = 1) +
+  
+  scale_fill_manual(values = sal6) +
+  
+  theme_minimal()+
+  
+  theme(legend.position = "none", panel.border = element_blank()) +
+  
+  geom_smooth(method = 'lm', formula = y~x, se = TRUE, show.legend = FALSE) +
+  
+  stat_poly_eq(aes(label = paste(..rr.label.., stat(p.value.label), sep = '~`,`~')),
+               formula = y~x, parse = TRUE, 
+               label.x.npc = 'right', label.y.npc = 'top', size = 2.7) + 
+  
+  facet_wrap(~variable, scales = "free_y", nrow = 2)
+
+
+p3b
+
+```
+
+
+
+######  robustness regression
+```{r}
+
+dat <- read.csv('remove_part_nodes.csv', header = T)
+
+p3c <- ggplot(dat, aes(x=Salinity, y=values, color = factor(remove_node_proportion))) +
+  
+  geom_point(alpha = 0.6, size = 1.6) +
+  
+  geom_smooth(method = 'lm', formula = y~x, se = F, show.legend = FALSE) +
+  
+  stat_poly_eq(aes(label = paste(..rr.label.., stat(p.value.label), sep = '~`,`~')),
+               formula = y~x, parse = TRUE, 
+               label.x.npc = 'right', label.y.npc = 'top', size = 2.7) + 
+  
+  scale_color_npg() +
+  
+  theme_minimal() + 
+  
+  facet_wrap(~variable, ncol = 1, scale = 'free_y')
+
+
+p3c
+
+```
+
+
+
+### 合并index and robustness
+```{r}
+
+library(patchwork)
+
+p3bc <- p3b + p3c + 
+  plot_layout(heights = c(1,1), widths = c(5, 1.2), ncol = 2, nrow = 1)
+
+
+p3bc
+
+
+ggsave(plot = p3bc, "Fig3bc.pdf", 
+       width = 260, height = 106, units = c("mm"), dpi = 300)
+
+```
+
+
+
+
