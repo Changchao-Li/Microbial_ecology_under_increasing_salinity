@@ -227,7 +227,7 @@ p1c
 ```{r}
 d1c2 <- read.csv("mantel_r_ALL.csv", header = TRUE)
 
-p1c2 <- ggplot(d1, aes(x = factor, y = mantel_r, fill = p_value)) + 
+p1c2 <- ggplot(d1c2, aes(x = factor, y = mantel_r, fill = p_value)) + 
   
   geom_bar(stat="identity") + 
   
